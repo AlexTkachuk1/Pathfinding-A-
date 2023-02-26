@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
 
 [RequireComponent(typeof(Grid))]
@@ -14,35 +15,34 @@ public class Pathfinding : MonoBehaviour
 
     private void Update()
     {
-        FindPath(seeker.position, target.position);
+        if (Input.GetButtonDown("Jump"))
+        {
+            FindPath(seeker.position, target.position);
+        }
     }
 
     private void FindPath(Vector3 startPosition, Vector3 targetPosition)
     {
+        Stopwatch sw = new Stopwatch();
+        sw.Start();
+
         Node startNode = _grid.GetNodeFromeWorldPoint(startPosition);
         Node targetNode = _grid.GetNodeFromeWorldPoint(targetPosition);
 
-        List<Node> openList = new List<Node>();
+        Heap<Node> openList = new Heap<Node>(_grid.maxSize);
         HashSet<Node> closeList = new HashSet<Node>();
 
         openList.Add(startNode);
 
         while (openList.Count > 0)
         {
-            Node currentNode = openList[0];
-            for (int i = 1; i < openList.Count; i++)
-            {
-                if (openList[i].FCost < currentNode.FCost || openList[i].FCost == currentNode.FCost && openList[i].HCost < currentNode.HCost)
-                {
-                    currentNode = openList[i];
-                }
-            }
-
-            openList.Remove(currentNode);
+            Node currentNode = openList.RemoveFirst();
             closeList.Add(currentNode);
 
             if (currentNode == targetNode)
             {
+                sw.Stop();
+                print($"Path found: {sw.ElapsedMilliseconds} ms");
                 RetracePath(startNode, targetNode);
                 return;
             }
@@ -71,7 +71,8 @@ public class Pathfinding : MonoBehaviour
     {
         List<Node> path = new List<Node>();
         Node currentNode = endNode;
-        while (currentNode != startNode){
+        while (currentNode != startNode)
+        {
             path.Add(currentNode);
             currentNode = currentNode.Parent;
         }
