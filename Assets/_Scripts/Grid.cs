@@ -4,6 +4,7 @@ using UnityEngine;
 public class Grid : MonoBehaviour
 {
     public List<Node> Path;
+    [SerializeField] public bool _onlyDisplayPathGizmous;
     [SerializeField] private LayerMask _obstacles;
     [SerializeField] private Vector2 _gridWorldSize;
     [SerializeField] private float _nodeRadius;
@@ -19,6 +20,14 @@ public class Grid : MonoBehaviour
         _gridSizeX = Mathf.RoundToInt(_gridWorldSize.x / _nodeDiametor);
         _gridSizeY = Mathf.RoundToInt(_gridWorldSize.y / _nodeDiametor);
         CreateGrid();
+    }
+
+    public int maxSize
+    {
+        get
+        {
+            return _gridSizeX * _gridSizeY;
+        }
     }
 
     private void CreateGrid()
@@ -79,15 +88,29 @@ public class Grid : MonoBehaviour
         Vector3 size = new Vector3(_gridWorldSize.x, 1, _gridWorldSize.y);
         Gizmos.DrawWireCube(transform.position, size);
 
-        if (_grid != null)
+        if (_onlyDisplayPathGizmous)
         {
-            foreach (Node node in _grid)
+            if (Path != null)
             {
-                Gizmos.color = node.Walkable ? Color.white : Color.red;
-                if (Path != null)
-                    if (Path.Contains(node))
-                        Gizmos.color = Color.black;
-                Gizmos.DrawCube(node.WorldPosition, Vector3.one * (_nodeDiametor - .1f));
+                foreach (var node in Path)
+                {
+                    Gizmos.color = Color.black;
+                    Gizmos.DrawCube(node.WorldPosition, Vector3.one * (_nodeDiametor - .1f));
+                }
+            }
+        }
+        else
+        {
+            if (_grid != null)
+            {
+                foreach (Node node in _grid)
+                {
+                    Gizmos.color = node.Walkable ? Color.white : Color.red;
+                    if (Path != null)
+                        if (Path.Contains(node))
+                            Gizmos.color = Color.black;
+                    Gizmos.DrawCube(node.WorldPosition, Vector3.one * (_nodeDiametor - .1f));
+                }
             }
         }
     }
