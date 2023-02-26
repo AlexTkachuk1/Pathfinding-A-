@@ -10,6 +10,11 @@ public class Heap<T> where T : IHeapItem<T>
         items = new T[maxHeapSize];
     }
 
+    public int Count
+    {
+        get { return currentItemCount; }
+    }
+
     public void Add(T item)
     {
         item.HeapIndex = currentItemCount;
@@ -31,11 +36,6 @@ public class Heap<T> where T : IHeapItem<T>
     public void UpdateItem(T item)
     {
         SortUp(item);
-    }
-
-    public int Count
-    {
-        get { return currentItemCount; }
     }
 
     public bool Contains(T item)
@@ -75,18 +75,18 @@ public class Heap<T> where T : IHeapItem<T>
 
     private void SortUp(T item)
     {
-        int parentInex = GetParentIndex(item);
+        int parentIndex = GetParentIndex(item);
 
         while (true)
         {
-            T patentItem = items[parentInex];
+            T patentItem = items[parentIndex];
             if (item.CompareTo(patentItem) > 0)
             {
                 Swap(item, patentItem);
             }
             else break;
 
-            parentInex = GetParentIndex(item);
+            parentIndex = GetParentIndex(item);
         }
     }
 
