@@ -3,16 +3,18 @@ using UnityEngine;
 public class Node : IHeapItem<Node>
 {
     public Node Parent;
+    private int _movmentPenalty;
     private bool _walkable;
     private Vector3 _worldPosition;
     private int _gCost;
     private int _hCost;
     private int _heapIndex;
 
-    public Node(bool walkable, Vector3 worldPosition, int gridX, int gridY)
+    public Node(bool walkable, Vector3 worldPosition, int gridX, int gridY, int penalty)
     {
         _walkable = walkable;
         _worldPosition = worldPosition;
+        _movmentPenalty = penalty;
         GridX = gridX;
         GridY = gridY;
     }
@@ -42,6 +44,11 @@ public class Node : IHeapItem<Node>
     public int FCost
     {
         get { return _gCost + _hCost; }
+    }
+    public int MovmentPenalty
+    {
+        get { return _movmentPenalty; }
+        set { _movmentPenalty = value; }
     }
 
     public int HeapIndex

@@ -7,7 +7,10 @@ public class Grid : MonoBehaviour
     [SerializeField] private LayerMask _obstacles;
     [SerializeField] private Vector2 _gridWorldSize;
     [SerializeField] private float _nodeRadius;
+    [SerializeField] TerrainType[] _walkableRegions;
 
+    private LayerMask _walkableMask;
+    private Dictionary<int, int> _walkableRegionsDictionary = new Dictionary<int, int>();
     private Node[,] _grid;
     private float _nodeDiametor;
     private int _gridSizeX, _gridSizeY;
@@ -18,6 +21,13 @@ public class Grid : MonoBehaviour
         _nodeDiametor = _nodeRadius * 2;
         _gridSizeX = Mathf.RoundToInt(_gridWorldSize.x / _nodeDiametor);
         _gridSizeY = Mathf.RoundToInt(_gridWorldSize.y / _nodeDiametor);
+
+        foreach (TerrainType region in _walkableRegions)
+        {
+            _walkableMask.value += region.terrainMask.value;
+            _walkableRegionsDictionary.Add((int)Mathf.Log(region.terrainMask.value, 2), region.terrainPanalty);
+        }
+         
         CreateGrid();
     }
 
@@ -41,7 +51,20 @@ public class Grid : MonoBehaviour
             {
                 Vector3 worldPoint = worldBottomLeft + Vector3.right * (x * _nodeDiametor + _nodeRadius) + Vector3.forward * (y * _nodeDiametor + _nodeRadius);
                 bool walkable = !(Physics.CheckSphere(worldPoint, _nodeRadius, _obstacles));
-                _grid[x, y] = new Node(walkable, worldPoint, x, y);
+
+                int movmentPenalty = 10;
+
+                if (walkable)
+                {
+                    Ray ray = new Ray(worldPoint + Vector3.up * 50, Vector3.down);
+                    RaycastHit hit;
+                    if (Physics.Raycast(ray, out hit, 100, _walkableMask))
+                    {
+                        _walkableRegionsDictionary.TryGetValue(hit.collider.gameObject.layer, out movmentPenalty);
+                    }
+                }
+
+                _grid[x, y] = new Node(walkable, worldPoint, x, y, movmentPenalty);
             }
         }
     }
@@ -95,5 +118,12 @@ public class Grid : MonoBehaviour
                 Gizmos.DrawCube(node.WorldPosition, Vector3.one * (_nodeDiametor - .1f));
             }
         }
+    }
+
+    [System.Serializable]
+    public class TerrainType
+    {
+        public LayerMask terrainMask;
+        public int terrainPanalty;
     }
 }
