@@ -1,8 +1,8 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Collections;
 using System.Diagnostics;
 using UnityEngine;
+using System;
 
 [RequireComponent(typeof(Grid))]
 [RequireComponent(typeof(PathRequestManager))]
@@ -58,7 +58,7 @@ public class Pathfinding : MonoBehaviour
                 {
                     if (!neighbour.Walkable || closeList.Contains(neighbour)) continue;
 
-                    int newMovementCostToNeighbour = currentNode.GCost + GetMovementCost(currentNode, neighbour);
+                    int newMovementCostToNeighbour = currentNode.GCost + GetMovementCost(currentNode, neighbour) + neighbour.MovmentPenalty;
                     if (newMovementCostToNeighbour < neighbour.GCost || !openList.Contains(neighbour))
                     {
                         neighbour.GCost = newMovementCostToNeighbour;
@@ -66,9 +66,8 @@ public class Pathfinding : MonoBehaviour
                         neighbour.Parent = currentNode;
 
                         if (!openList.Contains(neighbour))
-                        {
                             openList.Add(neighbour);
-                        }
+                        else openList.UpdateItem(neighbour);
                     }
                 }
             }
