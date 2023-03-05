@@ -47,9 +47,9 @@ public class Heap<T> where T : IHeapItem<T>
     {
         while (true)
         {
+            int swapIndex = 0;
             int childIndexLeft = item.HeapIndex * 2 + 1;
             int childIndexRight = item.HeapIndex * 2 + 2;
-            int swapIndex = 0;
 
             if (childIndexLeft < currentItemCount)
             {
@@ -58,9 +58,7 @@ public class Heap<T> where T : IHeapItem<T>
                 if (childIndexRight < currentItemCount)
                 {
                     if (items[childIndexLeft].CompareTo(items[childIndexRight]) < 0)
-                    {
                         swapIndex = childIndexRight;
-                    }
                 }
 
                 if (item.CompareTo(items[swapIndex]) < 0)
@@ -108,5 +106,4 @@ public class Heap<T> where T : IHeapItem<T>
 public interface IHeapItem<T> : IComparable<T>
 {
     public int HeapIndex { get; set; }
-
 }

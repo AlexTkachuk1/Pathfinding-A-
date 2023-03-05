@@ -4,16 +4,16 @@ using UnityEngine;
 public class Grid : MonoBehaviour
 {
     [SerializeField] public bool _DisplayGridGizmous;
-    [SerializeField] private LayerMask _obstacles;
-    [SerializeField] private Vector2 _gridWorldSize;
-    [SerializeField] private float _nodeRadius;
     [SerializeField] TerrainType[] _walkableRegions;
+    [SerializeField] private Vector2 _gridWorldSize;
+    [SerializeField] private LayerMask _obstacles;
+    [SerializeField] private float _nodeRadius;
 
-    private LayerMask _walkableMask;
     private Dictionary<int, int> _walkableRegionsDictionary = new Dictionary<int, int>();
-    private Node[,] _grid;
-    private float _nodeDiametor;
     private int _gridSizeX, _gridSizeY;
+    private LayerMask _walkableMask;
+    private float _nodeDiametor;
+    private Node[,] _grid;
 
 
     private void Awake()
@@ -27,7 +27,7 @@ public class Grid : MonoBehaviour
             _walkableMask.value += region.terrainMask.value;
             _walkableRegionsDictionary.Add((int)Mathf.Log(region.terrainMask.value, 2), region.terrainPanalty);
         }
-         
+
         CreateGrid();
     }
 
@@ -42,26 +42,28 @@ public class Grid : MonoBehaviour
     private void CreateGrid()
     {
         _grid = new Node[_gridSizeX, _gridSizeY];
-        Vector3 worldBottomLeft = transform.position - Vector3.right * _gridWorldSize.x / 2 - Vector3.forward * _gridWorldSize.y / 2;
-
+        Vector3 worldBottomLeft = transform.position - Vector3.right
+            * _gridWorldSize.x / 2 - Vector3.forward * _gridWorldSize.y / 2;
 
         for (int x = 0; x < _gridSizeX; x++)
         {
             for (int y = 0; y < _gridSizeY; y++)
             {
-                Vector3 worldPoint = worldBottomLeft + Vector3.right * (x * _nodeDiametor + _nodeRadius) + Vector3.forward * (y * _nodeDiametor + _nodeRadius);
+                Vector3 worldPoint = worldBottomLeft
+                    + Vector3.right * (x * _nodeDiametor + _nodeRadius)
+                    + Vector3.forward * (y * _nodeDiametor + _nodeRadius);
+
                 bool walkable = !(Physics.CheckSphere(worldPoint, _nodeRadius, _obstacles));
 
-                int movmentPenalty = 10;
+                int movmentPenalty = 0;
 
                 if (walkable)
                 {
                     Ray ray = new Ray(worldPoint + Vector3.up * 50, Vector3.down);
                     RaycastHit hit;
+
                     if (Physics.Raycast(ray, out hit, 100, _walkableMask))
-                    {
                         _walkableRegionsDictionary.TryGetValue(hit.collider.gameObject.layer, out movmentPenalty);
-                    }
                 }
 
                 _grid[x, y] = new Node(walkable, worldPoint, x, y, movmentPenalty);
@@ -96,6 +98,7 @@ public class Grid : MonoBehaviour
     {
         float percentX = (worldPosition.x + _gridWorldSize.x / 2) / _gridWorldSize.x;
         float percentY = (worldPosition.z + _gridWorldSize.y / 2) / _gridWorldSize.y;
+
         percentX = Mathf.Clamp01(percentX);
         percentY = Mathf.Clamp01(percentY);
 

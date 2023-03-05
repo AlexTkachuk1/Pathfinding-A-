@@ -1,28 +1,28 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 [RequireComponent(typeof(Pathfinding))]
 public class PathRequestManager : MonoBehaviour
 {
+    public static PathRequestManager Instance;
+
     private Queue<PathRequest> _pathRequestQueue = new Queue<PathRequest>();
     private PathRequest _currentPathRequest;
     private Pathfinding _pathfinding;
     private bool _isProcessingPath;
 
-    static PathRequestManager instance;
-
     private void Awake()
     {
-        instance = this;
+        Instance = this;
         _pathfinding = GetComponent<Pathfinding>();
     }
 
     public static void ReuestPath(Vector3 pathStart, Vector3 pathEnd, Action<Vector3[], bool> callback)
     {
         PathRequest newRequest = new PathRequest(pathStart, pathEnd, callback);
-        instance._pathRequestQueue.Enqueue(newRequest);
-        instance.TryProcessNext();
+        Instance._pathRequestQueue.Enqueue(newRequest);
+        Instance.TryProcessNext();
     }
 
     public void FinishedProcessingPath(Vector3[] path, bool success)
@@ -54,6 +54,5 @@ public class PathRequestManager : MonoBehaviour
             PathEnd = end;
             Callback = callback;
         }
-
     }
 }
