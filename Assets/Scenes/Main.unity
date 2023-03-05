@@ -1081,20 +1081,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _DisplayGridGizmous: 0
-  _obstacles:
-    serializedVersion: 2
-    m_Bits: 128
-  _gridWorldSize: {x: 100, y: 100}
-  _nodeRadius: 0.5
   _walkableRegions:
   - terrainMask:
       serializedVersion: 2
       m_Bits: 512
-    terrainPanalty: 5
+    terrainPanalty: 0
   - terrainMask:
       serializedVersion: 2
       m_Bits: 256
-    terrainPanalty: 0
+    terrainPanalty: 5
+  _gridWorldSize: {x: 100, y: 100}
+  _obstacles:
+    serializedVersion: 2
+    m_Bits: 128
+  _nodeRadius: 0.5
 --- !u!114 &1097112649
 MonoBehaviour:
   m_ObjectHideFlags: 0

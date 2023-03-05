@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Collections;
-using System.Diagnostics;
 using UnityEngine;
 using System;
 
@@ -8,7 +7,6 @@ using System;
 [RequireComponent(typeof(PathRequestManager))]
 public class Pathfinding : MonoBehaviour
 {
-
     private PathRequestManager _pathRequestManager;
     private Grid _grid;
 
@@ -25,9 +23,6 @@ public class Pathfinding : MonoBehaviour
 
     private IEnumerator FindPath(Vector3 startPosition, Vector3 targetPosition)
     {
-        Stopwatch sw = new Stopwatch();
-        sw.Start();
-
         Vector3[] waypoints = new Vector3[0];
         bool pathSuccess = false;
 
@@ -48,8 +43,6 @@ public class Pathfinding : MonoBehaviour
 
                 if (currentNode == targetNode)
                 {
-                    sw.Stop();
-                    print($"Path found: {sw.ElapsedMilliseconds} ms");
                     pathSuccess = true;
                     break;
                 }
@@ -59,6 +52,7 @@ public class Pathfinding : MonoBehaviour
                     if (!neighbour.Walkable || closeList.Contains(neighbour)) continue;
 
                     int newMovementCostToNeighbour = currentNode.GCost + GetMovementCost(currentNode, neighbour) + neighbour.MovmentPenalty;
+
                     if (newMovementCostToNeighbour < neighbour.GCost || !openList.Contains(neighbour))
                     {
                         neighbour.GCost = newMovementCostToNeighbour;
@@ -81,11 +75,13 @@ public class Pathfinding : MonoBehaviour
     {
         List<Node> path = new List<Node>();
         Node currentNode = endNode;
+
         while (currentNode != startNode)
         {
             path.Add(currentNode);
             currentNode = currentNode.Parent;
         }
+
         Vector3[] waypoints = SimplifyPath(path);
         Array.Reverse(waypoints);
 
@@ -99,13 +95,17 @@ public class Pathfinding : MonoBehaviour
 
         for (int i = 1; i < path.Count; i++)
         {
-            Vector2 directionNew = new Vector2(path[i - 1].GridX - path[i].GridX, path[i - 1].GridY - path[i].GridY);
+            float x = path[i - 1].GridX - path[i].GridX;
+            float y = path[i - 1].GridY - path[i].GridY;
+
+            Vector2 directionNew = new Vector2(x, y);
+
             if (directionNew != directionOld)
-            {
                 waypoints.Add(path[i].WorldPosition);
-            }
+
             directionOld = directionNew;
         }
+
         return waypoints.ToArray();
     }
 
